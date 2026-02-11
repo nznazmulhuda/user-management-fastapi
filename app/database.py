@@ -9,6 +9,8 @@ APP_NAME = "user-management"
 APP_AUTHOR = "nazmulhuda"
 
 # 2. Get the OS-specific data directory
+
+
 # Windows: C:\Users\User\AppData\Local\YourCompany\TengenApp
 # macOS: ~/Library/Application Support/TengenApp
 # Linux: ~/.local/share/TengenApp
