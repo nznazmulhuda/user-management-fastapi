@@ -1,11 +1,12 @@
-name: Build Backend Binary
+name: Backend Release Build
 
 on:
-  workflow_dispatch:
   push:
-    paths:
-      - "/**"
-      - ".github/workflows/backend-build.yml"
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -14,21 +15,18 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            target: windows
             artifact_name: backend-x86_64-pc-windows-msvc.exe
 
           - os: macos-latest
-            target: macos
             artifact_name: backend-x86_64-apple-darwin
 
           - os: ubuntu-latest
-            target: linux
             artifact_name: backend-x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -36,24 +34,22 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: |
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build with PyInstaller
-        run: |
-          pyinstaller main.py \
-            --onefile \
-            --name backend
+      - name: Build backend binary
+        run: pyinstaller main.py --onefile --name backend
 
-      - name: Rename output for Tauri
+      - name: Rename binary for Tauri
         run: |
-          mkdir -p dist_out
+          mkdir dist_out
           mv dist/backend* dist_out/${{ matrix.artifact_name }}
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: ${{ matrix.artifact_name }}
-          path: dist_out/${{ matrix.artifact_name }}
+          files: dist_out/${{ matrix.artifact_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
