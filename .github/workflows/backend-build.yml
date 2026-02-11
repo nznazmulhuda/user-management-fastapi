@@ -38,12 +38,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r backend/requirements.txt
+          pip install -r requirements.txt
           pip install pyinstaller
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller backend/main.py \
+          pyinstaller main.py \
             --onefile \
             --name backend
 
